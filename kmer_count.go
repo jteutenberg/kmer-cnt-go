@@ -60,7 +60,7 @@ func makeKmers(k int, sequences <-chan string, kmersOut []chan []uint64, done ch
 			bb := uint64(b)
 			//shuffle it in to make the next k-mer and its reverse complement
 			next = ((next << 2) | bb) & mask
-			nextRC = ((nextRC >> 2) | ((^bb) << toShift) & mask) //XOR to complement
+			nextRC = ((nextRC >> 2) | ((^bb) << toShift) & mask) //NOT to complement, shift to end to reverse
 			if i < k-1 {
 				//haven't seen enough bases to make the first k-mer yet
 				continue
