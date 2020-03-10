@@ -23,7 +23,7 @@ func seqLineReader(input io.Reader, lines chan<- string, done chan<- bool) {
 }
 
 //splitNs reads strings from the lines channel, splits these by
-//any non-ACGT characters, forwarding the tokens onto all the splitLines channels
+//any non-ACGT characters, forwarding the tokens onto the splitLines channel
 func splitNs(minLength int, lines <-chan string, splitLines chan<- string, done chan<- bool) {
 	for line, ok := <-lines; ok; line, ok = <-lines {
 		start := 0
@@ -99,7 +99,7 @@ func countKmers(filter, filterMask uint64, counts map[uint64]int, kmerSequences 
 }
 
 //printHist writes a histogram of the number of entries of an int->int map with
-//given value (to a maximum of 255) stdout.
+//given value (to a maximum of 255) to stdout.
 func printHist(counts []map[uint64]int) {
 	hist := make([]int, 256)
 	for _, nextCounts := range counts {
@@ -121,14 +121,14 @@ func main() {
 	k := 31
 	numMaps := 16 //only use powers of 2, or the map filtering will be wrong
 
-	filterMask := uint64(numMaps-1) //split maps on using these lower bits
+	filterMask := uint64(numMaps-1) //split maps using these lower bits
 
 	// Pipeline stage 1: prepare an input stream from stdin
 	doneLines := make(chan bool, 1)
 	inputStrings := make(chan string, 3)
 	go seqLineReader(os.Stdin, inputStrings, doneLines)
 
-	// Pipeline stage 2: workers to split on and remove Ns etc.
+	// Pipeline stage 2: workers to split on (and remove) Ns etc.
 	numWorkers := 4
 	doneSplits := make(chan bool, numWorkers)
 	sequences := make(chan string, 3)
@@ -147,7 +147,7 @@ func main() {
 		go makeKmers(k, sequences, kmerSequences, doneKmers)
 	}
 
-	// Pipeline stage 4: count kmers from the good sequence strings
+	// Pipeline stage 4: count kmers into disjoint maps
 	allCounts := make([]map[uint64]int, numMaps)
 	doneCounting := make(chan bool, numMaps)
 	for i, seqs := range kmerSequences {
