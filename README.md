@@ -20,3 +20,5 @@ Assuming you are using Heng Li's benchmark file: M_abscessus_HiSeq_10M.fa.gz
 As noted above, this makes use of the standard golang map and this forms the bottleneck. By default it writes to 16 maps in parallel though on machines with more than 16 cores I expect this can usefully be increased to 32.
 
 On an 8-core / 16 thread Zen machine this takes 33s, slightly less time than kc-c1.
+
+By contrast, writing to a single map (by setting numMaps to 1) this takes 94s though it still uses separate threads for file reading and generating k-mers.
